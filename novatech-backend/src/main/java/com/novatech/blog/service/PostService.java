@@ -3,13 +3,18 @@ package com.novatech.blog.service;
 import com.novatech.blog.dto.PostRequest;
 import com.novatech.blog.dto.PostResponse;
 import com.novatech.blog.entity.Post;
+import com.novatech.blog.entity.Category;
+import com.novatech.blog.entity.Tag;
 import com.novatech.blog.repository.PostRepository;
+import com.novatech.blog.repository.CategoryRepository;
+import com.novatech.blog.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +22,8 @@ import java.util.stream.Collectors;
 public class PostService {
     
     private final PostRepository postRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
     public List<PostResponse> getAllPosts() {
@@ -41,13 +48,29 @@ public class PostService {
             slug = slug + "-" + System.currentTimeMillis();
         }
         
+        // Create or find category
+        Category category = categoryRepository.findByName(request.getCategory())
+                .orElseGet(() -> {
+                    Category newCategory = Category.builder().name(request.getCategory()).build();
+                    return categoryRepository.save(newCategory);
+                });
+        
+        // Create or find tags
+        Set<Tag> tags = request.getTags().stream()
+                .map(tagName -> tagRepository.findByName(tagName)
+                        .orElseGet(() -> {
+                            Tag newTag = Tag.builder().name(tagName).build();
+                            return tagRepository.save(newTag);
+                        }))
+                .collect(Collectors.toSet());
+        
         Post post = Post.builder()
                 .slug(slug)
                 .title(request.getTitle())
                 .excerpt(request.getExcerpt())
                 .content(request.getContent())
-                .category(request.getCategory())
-                .tags(request.getTags())
+                .category(category)
+                .tags(tags)
                 .readTime(request.getReadTime() != null ? request.getReadTime() : "5 min")
                 .build();
         
@@ -63,8 +86,25 @@ public class PostService {
         post.setTitle(request.getTitle());
         post.setExcerpt(request.getExcerpt());
         post.setContent(request.getContent());
-        post.setCategory(request.getCategory());
-        post.setTags(request.getTags());
+        
+        // Update category
+        Category category = categoryRepository.findByName(request.getCategory())
+                .orElseGet(() -> {
+                    Category newCategory = Category.builder().name(request.getCategory()).build();
+                    return categoryRepository.save(newCategory);
+                });
+        post.setCategory(category);
+        
+        // Update tags
+        Set<Tag> tags = request.getTags().stream()
+                .map(tagName -> tagRepository.findByName(tagName)
+                        .orElseGet(() -> {
+                            Tag newTag = Tag.builder().name(tagName).build();
+                            return tagRepository.save(newTag);
+                        }))
+                .collect(Collectors.toSet());
+        post.setTags(tags);
+        
         if (request.getReadTime() != null) {
             post.setReadTime(request.getReadTime());
         }
@@ -88,8 +128,10 @@ public class PostService {
                 .title(post.getTitle())
                 .excerpt(post.getExcerpt())
                 .content(post.getContent())
-                .category(post.getCategory())
-                .tags(post.getTags())
+                .category(post.getCategory() != null ? post.getCategory().getName() : null)
+                .tags(post.getTags() != null ? 
+                        post.getTags().stream().map(Tag::getName).collect(Collectors.toList()) : 
+                        List.of())
                 .readTime(post.getReadTime())
                 .createdAt(post.getCreatedAt())
                 .date(post.getCreatedAt().format(DATE_FORMATTER))

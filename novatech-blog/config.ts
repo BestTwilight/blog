@@ -19,12 +19,13 @@ export const CONFIG = {
   HERO: {
     TITLE_LINE_1: "Decoded",
     TITLE_LINE_2: "Knowledge",
-    SUBTITLE: "For The Future",
-    DESCRIPTION_PREFIX: "Exploring the digital frontier through",
+    SUBTITLE: "光速接口的博客",
+    DESCRIPTION_PREFIX: "分享关于",
     HIGHLIGHTS: [
-      { text: "Frontend Architecture", color: "text-cyan-300" },
-      { text: "AI Integration", color: "text-purple-300" },
-      { text: "Design Patterns", color: "text-white" }
+      { text: "后端", color: "text-cyan-300" },
+      { text: "AI", color: "text-purple-300" },
+      { text: "前端", color: "text-green-400" },
+      { text: "的开发经验", color: "text-gray-300" }
     ]
   }
 };

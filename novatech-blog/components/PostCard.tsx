@@ -15,7 +15,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
     Backend: { color: 'text-green-400', border: 'border-green-400/20', bg: 'bg-green-400/10' },
     AI: { color: 'text-purple-400', border: 'border-purple-400/20', bg: 'bg-purple-400/10' },
     DevOps: { color: 'text-orange-400', border: 'border-orange-400/20', bg: 'bg-orange-400/10' },
-    General: { color: 'text-slate-400', border: 'border-slate-400/20', bg: 'bg-slate-400/10' },
+    General: { color: 'text-#C5A059-400', border: 'border-slate-400/20', bg: 'bg-slate-400/10' },
   }[post.category] || { color: 'text-slate-400', border: 'border-slate-400/20', bg: 'bg-slate-400/10' };
 
   return (

@@ -1,6 +1,8 @@
 package com.novatech.blog.config;
 
 import com.novatech.blog.entity.Post;
+import com.novatech.blog.entity.Category;
+import com.novatech.blog.entity.Tag;
 import com.novatech.blog.entity.Role;
 import com.novatech.blog.entity.User;
 import com.novatech.blog.repository.PostRepository;
@@ -12,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -47,9 +51,9 @@ public class DataInitializer implements CommandLineRunner {
                     .slug("welcome-to-novatech")
                     .title("Architecting the Future: Why I Built NovaTech")
                     .excerpt("A deep dive into the tech stack behind this blog, featuring React 19, Tailwind CSS, and Gemini AI integration.")
-                    .category("Frontend")
+                    .category(Category.builder().name("Frontend").build())
                     .readTime("5 min")
-                    .tags(List.of("React", "Architecture", "Design"))
+                    .tags(createTags(List.of("React", "Architecture", "Design")))
                     .content("""
                         <div class="space-y-6">
                           <p class="lead text-xl text-slate-300">
@@ -90,9 +94,9 @@ public class DataInitializer implements CommandLineRunner {
                     .slug("understanding-react-server-components")
                     .title("Understanding React Server Components")
                     .excerpt("RSC is shifting the paradigm of frontend development. Here is what you need to know.")
-                    .category("Frontend")
+                    .category(Category.builder().name("Frontend").build())
                     .readTime("7 min")
-                    .tags(List.of("React", "RSC", "Next.js"))
+                    .tags(createTags(List.of("React", "RSC", "Next.js")))
                     .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
@@ -127,14 +131,20 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
     
+    private Set<Tag> createTags(List<String> tagNames) {
+        return tagNames.stream()
+                .map(name -> Tag.builder().name(name).build())
+                .collect(Collectors.toSet());
+    }
+    
     private Post createBackendArchitecturePost() {
         return Post.builder()
                 .slug("spring-boot-architecture-best-practices")
                 .title("Spring Boot Architecture: Best Practices for 2024")
                 .excerpt("Designing scalable and maintainable Spring Boot applications using layered architecture, dependency injection, and clean code principles.")
-                .category("Backend")
+                .category(Category.builder().name("Backend").build())
                 .readTime("8 min")
-                .tags(List.of("Spring Boot", "Java", "Architecture", "Best Practices"))
+                .tags(createTags(List.of("Spring Boot", "Java", "Architecture", "Best Practices")))
                 .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
@@ -183,9 +193,9 @@ public class DataInitializer implements CommandLineRunner {
                 .slug("containerization-with-docker-kubernetes")
                 .title("Containerization Journey: Docker and Kubernetes")
                 .excerpt("From development to production: deploying applications using Docker containers and orchestrating them with Kubernetes.")
-                .category("DevOps")
+                .category(Category.builder().name("DevOps").build())
                 .readTime("10 min")
-                .tags(List.of("Docker", "Kubernetes", "DevOps", "Cloud"))
+                .tags(createTags(List.of("Docker", "Kubernetes", "DevOps", "Cloud")))
                 .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
@@ -229,9 +239,9 @@ public class DataInitializer implements CommandLineRunner {
                 .slug("gemini-ai-integration-web-apps")
                 .title("Integrating Gemini AI into Your Web Applications")
                 .excerpt("Leverage Google's powerful Gemini API to add intelligent features to your applications with minimal effort.")
-                .category("AI")
+                .category(Category.builder().name("AI").build())
                 .readTime("9 min")
-                .tags(List.of("AI", "Gemini", "API", "Integration"))
+                .tags(createTags(List.of("AI", "Gemini", "API", "Integration")))
                 .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
@@ -276,9 +286,9 @@ public class DataInitializer implements CommandLineRunner {
                 .slug("design-patterns-in-modern-development")
                 .title("Design Patterns: Building Better Code Architecture")
                 .excerpt("Master essential design patterns that solve common software design problems and improve code quality.")
-                .category("Backend")
+                .category(Category.builder().name("Backend").build())
                 .readTime("11 min")
-                .tags(List.of("Design Patterns", "Architecture", "Best Practices"))
+                .tags(createTags(List.of("Design Patterns", "Architecture", "Best Practices")))
                 .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
@@ -322,9 +332,9 @@ public class DataInitializer implements CommandLineRunner {
                 .slug("web-performance-optimization-techniques")
                 .title("Web Performance Optimization: A Complete Guide")
                 .excerpt("Techniques to measure, analyze, and optimize your web application's performance for faster load times and better UX.")
-                .category("Frontend")
+                .category(Category.builder().name("Frontend").build())
                 .readTime("12 min")
-                .tags(List.of("Performance", "Optimization", "Frontend"))
+                .tags(createTags(List.of("Performance", "Optimization", "Frontend")))
                 .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
@@ -371,9 +381,9 @@ public class DataInitializer implements CommandLineRunner {
                 .slug("security-best-practices-modern-web")
                 .title("Security Best Practices for Modern Web Applications")
                 .excerpt("Protect your users and data by implementing essential security measures and following industry best practices.")
-                .category("Backend")
+                .category(Category.builder().name("Backend").build())
                 .readTime("10 min")
-                .tags(List.of("Security", "Best Practices", "Authentication"))
+                .tags(createTags(List.of("Security", "Best Practices", "Authentication")))
                 .content("""
                         <div class="space-y-6">
                           <p class="text-lg text-slate-300">
