@@ -8,7 +8,8 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const API_BASE_URL = 'http://localhost:8080/api';
+// Updated to match backend API v1
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -17,7 +18,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Check local storage on load - verify token is still valid
     const token = localStorage.getItem('novatech_auth_token');
     if (token) {
-      setIsAdmin(true);
+      // Decode token to check if user is admin (simplified - in reality you'd verify the JWT)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role === 'ADMIN') {
+          setIsAdmin(true);
+        }
+      } catch (e) {
+        // Invalid token, remove it
+        localStorage.removeItem('novatech_auth_token');
+      }
     }
   }, []);
 
@@ -32,7 +42,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('novatech_auth_token', data.token);
-        setIsAdmin(true);
+        // Check if user is admin
+        if (data.role === 'ADMIN') {
+          setIsAdmin(true);
+        }
         return true;
       }
       return false;

@@ -1,18 +1,18 @@
 spring:
   application:
     name: novatech-blog-backend
-  
+
   datasource:
     url: jdbc:h2:mem:blogdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
-  
+    password:
+
   h2:
     console:
       enabled: true
       path: /h2-console
-  
+
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -21,7 +21,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
-  
+
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -34,8 +34,9 @@ server:
     include-binding-errors: always
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000  # 24 hours in milliseconds
+  # 使用环境变量，如果未设置则使用默认值（仅开发环境）
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 小时
 
 logging:
   level:

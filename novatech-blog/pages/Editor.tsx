@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, Eye, Edit3, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { Save, Eye, Edit3, ArrowLeft, CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { savePost } from '../services/blogService';
 import { BlogPost } from '../types';
@@ -12,15 +11,59 @@ export const Editor: React.FC = () => {
   const [excerpt, setExcerpt] = useState('');
   const [category, setCategory] = useState<BlogPost['category']>('General');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState('');
   const [readTime, setReadTime] = useState('5 min');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  const handleAddTag = () => {
+    if (newTag.trim() && !tags.includes(newTag.trim()) && tags.length < 10) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
   const handleSave = async () => {
     if (!title || !content) {
       setError('Title and content are required');
+      return;
+    }
+    
+    if (title.length < 5 || title.length > 200) {
+      setError('Title must be between 5 and 200 characters');
+      return;
+    }
+    
+    if (excerpt && (excerpt.length < 20 || excerpt.length > 500)) {
+      setError('Excerpt must be between 20 and 500 characters');
+      return;
+    }
+    
+    if (content.length < 50) {
+      setError('Content must be at least 50 characters');
+      return;
+    }
+    
+    if (!category) {
+      setError('Category is required');
+      return;
+    }
+    
+    if (readTime && !/^\d+\s+(min|hour|hours)$/.test(readTime)) {
+      setError('Read time format is invalid (e.g., "5 min" or "1 hour")');
       return;
     }
     
@@ -34,7 +77,7 @@ export const Editor: React.FC = () => {
         excerpt: excerpt || content.substring(0, 100) + '...',
         content,
         category,
-        tags: tags ? tags.split(',').map(t => t.trim()) : ['Blog'],
+        tags,
         readTime: readTime || '5 min',
         date: new Date().toISOString().split('T')[0]
       };
@@ -48,7 +91,8 @@ export const Editor: React.FC = () => {
       setTitle('');
       setExcerpt('');
       setContent('');
-      setTags('');
+      setTags([]);
+      setNewTag('');
       
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -118,14 +162,14 @@ export const Editor: React.FC = () => {
         <div className="flex flex-col gap-4 h-full overflow-y-auto">
           <input 
             type="text" 
-            placeholder="Post Title..." 
+            placeholder="Post Title (5-200 characters)..." 
             value={title}
             onChange={e => setTitle(e.target.value)}
             className="bg-transparent text-4xl font-bold text-white placeholder:text-slate-700 border-none outline-none"
           />
           
           <textarea
-            placeholder="Brief excerpt (optional)"
+            placeholder="Brief excerpt (20-500 characters, optional)"
             value={excerpt}
             onChange={e => setExcerpt(e.target.value)}
             className="bg-slate-900/50 border border-slate-700 rounded-md px-3 py-2 text-slate-300 text-sm resize-none h-20 outline-none focus:border-cyan-400"
@@ -144,14 +188,41 @@ export const Editor: React.FC = () => {
               <option value="General">General</option>
             </select>
             
-            <input
-              type="text"
-              placeholder="Tags (comma-separated)"
-              value={tags}
-              onChange={e => setTags(e.target.value)}
-              className="flex-1 bg-slate-900 text-slate-300 border border-slate-700 rounded-md px-3 py-1 text-sm outline-none focus:border-cyan-500"
-            />
-            
+            <div className="flex-1 flex flex-wrap gap-2">
+              {tags.map(tag => (
+                <span 
+                  key={tag} 
+                  className="inline-flex items-center gap-1 bg-slate-800 text-slate-300 px-2 py-1 rounded-full text-xs"
+                >
+                  {tag}
+                  <button 
+                    onClick={() => handleRemoveTag(tag)}
+                    className="text-slate-500 hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  placeholder="Add tag..."
+                  value={newTag}
+                  onChange={e => setNewTag(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="bg-slate-900 text-slate-300 border border-slate-700 rounded-md px-2 py-1 text-xs outline-none focus:border-cyan-500"
+                />
+                <button
+                  onClick={handleAddTag}
+                  className="bg-slate-800 text-slate-400 hover:text-white p-1 rounded-md"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex gap-4">
             <input
               type="text"
               placeholder="Read time (e.g., 5 min)"
@@ -164,7 +235,7 @@ export const Editor: React.FC = () => {
           <div className="flex-1 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-900/30">
              <textarea
                className="w-full h-full bg-transparent p-6 text-slate-300 resize-none outline-none font-mono leading-relaxed"
-               placeholder="Write your masterpiece in HTML or Markdown..."
+               placeholder="Write your masterpiece (minimum 50 characters)..."
                value={content}
                onChange={e => setContent(e.target.value)}
              />
